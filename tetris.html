@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Najdziwniejszy Tetris</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 2px solid black;
+            background-color: #fafafa;
+        }
+        .scoreboard {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="scoreboard">
+        <p>Punkty: <span id="score">0</span></p>
+    </div>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const COLS = 10, ROWS = 20, BLOCK_SIZE = 25; // 10 kolumn i 20 wierszy
+        let board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+        let colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFDB33', '#33FFF0', '#8D33FF'];
+
+        let currentPiece, score = 0;
+        let dropInterval = 1000; // co 1 sekundę
+        let lastDropTime = Date.now();
+
+        // Najdziwniejsze kształty klocków
+        const weirdPieces = [
+            [[1, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0]], // długa kolumna z "guzikiem"
+            [[1, 1, 0], [1, 0, 1], [0, 1, 1]], // asymetryczna bryła
+            [[1, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 0]], // dziwny "mostek"
+            [[1, 1], [1, 0], [1, 1], [0, 1]], // nieregularny "wąż"
+            [[1, 1, 1], [1, 0, 0], [0, 1, 1]], // hak z ogonem
+            [[1, 0, 1], [1, 1, 1]], // litera "Y"
+            [[1, 1, 0], [0, 1, 1], [1, 0, 1]] // dziwaczny "X"
+        ];
+
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (board[r][c] !== 0) {
+                        ctx.fillStyle = colors[board[r][c] - 1];
+                        ctx.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    }
+                }
+            }
+        }
+
+        function drawPiece(piece) {
+            for (let r = 0; r < piece.shape.length; r++) {
+                for (let c = 0; c < piece.shape[r].length; c++) {
+                    if (piece.shape[r][c] !== 0) {
+                        ctx.fillStyle = colors[piece.color];
+                        ctx.fillRect((c + piece.x) * BLOCK_SIZE, (r + piece.y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    }
+                }
+            }
+        }
+
+        function generateWeirdPiece() {
+            const id = Math.floor(Math.random() * weirdPieces.length);
+            const shape = weirdPieces[id];
+            return { shape, color: id, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
+        }
+
+        function rotatePiece(piece) {
+            const newShape = piece.shape[0].map((_, i) => piece.shape.map(row => row[i])).reverse();
+            return { ...piece, shape: newShape };
+        }
+
+        function collision(piece, xOffset, yOffset) {
+            for (let r = 0; r < piece.shape.length; r++) {
+                for (let c = 0; c < piece.shape[r].length; c++) {
+                    if (piece.shape[r][c] !== 0) {
+                        let newX = c + piece.x + xOffset;
+                        let newY = r + piece.y + yOffset;
+                        if (newX < 0 || newX >= COLS || newY >= ROWS || (newY >= 0 && board[newY][newX] !== 0)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function merge(piece) {
+            for (let r = 0; r < piece.shape.length; r++) {
+                for (let c = 0; c < piece.shape[r].length; c++) {
+                    if (piece.shape[r][c] !== 0) {
+                        board[piece.y + r][piece.x + c] = piece.color + 1;
+                    }
+                }
+            }
+        }
+
+        function clearLines() {
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r].every(cell => cell !== 0)) {
+                    board.splice(r, 1);
+                    board.unshift(Array(COLS).fill(0));
+                    score += 100;
+                }
+            }
+        }
+
+        function drop() {
+            if (!collision(currentPiece, 0, 1)) {
+                currentPiece.y++;
+            } else {
+                merge(currentPiece);
+                clearLines();
+                currentPiece = generateWeirdPiece();
+                if (collision(currentPiece, 0, 0)) {
+                    alert('Koniec gry! Twój wynik to: ' + score);
+                    resetGame();
+                }
+            }
+        }
+
+        function movePiece(offsetX) {
+            if (!collision(currentPiece, offsetX, 0)) {
+                currentPiece.x += offsetX;
+            }
+        }
+
+        function rotateCurrentPiece() {
+            const rotated = rotatePiece(currentPiece);
+            if (!collision(rotated, 0, 0)) {
+                currentPiece = rotated;
+            }
+        }
+
+        function resetGame() {
+            board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+            score = 0;
+            currentPiece = generateWeirdPiece();
+        }
+
+        function update() {
+            const now = Date.now();
+            if (now - lastDropTime > dropInterval) {
+                drop();
+                lastDropTime = now;
+            }
+            drawBoard();
+            drawPiece(currentPiece);
+            document.getElementById('score').textContent = score;
+            requestAnimationFrame(update);
+        }
+
+        // Obsługa klawiatury
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    movePiece(-1);
+                    break;
+                case 'ArrowRight':
+                    movePiece(1);
+                    break;
+                case 'ArrowDown':
+                    drop(); // Szybkie opadanie
+                    break;
+                case 'ArrowUp':
+                    rotateCurrentPiece(); // Obracanie klocka
+                    break;
+            }
+        });
+
+        // Obsługa dotyku na urządzeniach mobilnych
+        canvas.addEventListener('touchstart', (e) => {
+            const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+            const touchY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
+            if (touchX < canvas.width / 2) {
+                movePiece(-1); // Przesuń w lewo
+            } else {
+                movePiece(1); // Przesuń w prawo
+            }
+        });
+
+        currentPiece = generateWeirdPiece();
+        update();
+    </script>
+</body>
+</html>
