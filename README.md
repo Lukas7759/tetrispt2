@@ -1,5 +1,4 @@
-Jasne, oto opisy gry po angielsku i po polsku:
-
+2024.10.27 update
 ---
 
 **Polski**:
