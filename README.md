@@ -1,3 +1,18 @@
+Jasne, oto opisy gry po angielsku i po polsku:
+
+---
+
+**Polski**:
+
+Xavery2 Tetris to dynamiczna wersja klasycznej gry Tetris, zaprojektowana dla graczy na urządzeniach mobilnych i komputerach. Gra oferuje klasyczne elementy rozgrywki, takie jak obracanie, przesuwanie, opadanie twarde i miękkie klocków, a także funkcję trzymania wybranego klocka. Dodatkowo, gracze mogą sprawdzać swoje statystyki, takie jak poziom, wynik, a także przeglądać swoje najlepsze wyniki. Xavery2 Tetris jest również wyposażony w efekty wizualne dostosowujące się do trybu ciemnego i jasnego, co pozwala na komfortową rozgrywkę w różnych warunkach oświetleniowych.
+
+---
+
+**English**:
+
+Xavery2 Tetris is a dynamic version of the classic Tetris game, designed for players on both mobile and desktop devices. The game offers traditional gameplay elements, including rotating, moving, hard and soft dropping blocks, and holding a selected piece. Additionally, players can track their stats, such as level, score, and review their high scores. Xavery2 Tetris also features visuals that adapt to dark and light modes, providing a comfortable gaming experience in various lighting conditions.
+---
+---
 
 # The Weirdest Tetris
 
