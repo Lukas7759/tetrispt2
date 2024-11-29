@@ -7,7 +7,7 @@ zmieniono wygląd motywu jasnego i ciemnego
 
 **English**
 
-change colors dakr & white motive
+change color's dakr & white motive
 
 ---
 2024.10.27 update
