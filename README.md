@@ -1,3 +1,14 @@
+2024.11.29
+
+
+**Polski**
+zmieniono wygląd motywu jasnego i ciemnego 
+
+**English**
+
+change colors dakr & white motive
+
+---
 2024.10.27 update
 ---
 
