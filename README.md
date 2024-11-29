@@ -2,6 +2,7 @@
 ---
 
 **Polski**
+
 zmieniono wygląd motywu jasnego i ciemnego 
 
 **English**
